@@ -28,9 +28,9 @@ db = mongo_client["db"]
 os.environ["OPENAI_API_KEY"] = "<INSERT_YOUR_KEY>"
 
 # Load data and setup tools
-data_file = "./energy_readings.csv"
-if not os.path.exists(data_file):
-    raise FileNotFoundError(f"Required data file not found: {data_file}")
+#data_file = "./energy_readings.csv"
+#if not os.path.exists(data_file):
+#    raise FileNotFoundError(f"Required data file not found: {data_file}")
 
 df = pd.read_csv(data_file)
 
