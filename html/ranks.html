@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rankings</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header with Sidebar Trigger -->
+        <div class="header">
+            <!-- Hamburger Icon -->
+            <span class="hamburger" onclick="toggleSidebar()">&#9776;</span>
+            <span class="moon" onclick="toggleDarkMode()">&#9789;</span>
+            <h1>Rankings</h1>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <div id="sidebar" class="sidebar">
+            <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">&times;</a>
+            <a href="profile.html">My Profile</a>
+            <a href="index.html">Home</a>
+            <a href="ranks.html">Ranks</a>
+            <a href="charts.html">Charts</a>
+        </div>
+
+        <!-- Rankings Content -->
+        <div class="ranking-container">
+            <!-- Bars arranged in descending order -->
+            <div class="ranking-item">
+                <span class="ranking-name">Alice</span>
+                <div class="ranking-bar" style="width: 90%;" data-points="90">
+                    <div class="ranking-tooltip">Completed 45 tasks, 5 extra points for consistency</div>
+                </div>
+            </div>
+            <div class="ranking-item">
+                <span class="ranking-name">Diana</span>
+                <div class="ranking-bar" style="width: 80%;" data-points="80">
+                    <div class="ranking-tooltip">Completed 40 tasks, 5 extra points for leadership</div>
+                </div>
+            </div>
+            <div class="ranking-item">
+                <span class="ranking-name">Bob</span>
+                <div class="ranking-bar" style="width: 75%;" data-points="75">
+                    <div class="ranking-tooltip">Completed 35 tasks, 10 extra points for creativity</div>
+                </div>
+            </div>
+            <div class="ranking-item">
+                <span class="ranking-name">Charlie</span>
+                <div class="ranking-bar" style="width: 60%;" data-points="60">
+                    <div class="ranking-tooltip">Completed 30 tasks, no extra points</div>
+                </div>
+            </div>
+            <div class="ranking-item">
+                <span class="ranking-name">Emily</span>
+                <div class="ranking-bar" style="width: 55%;" data-points="55">
+                    <div class="ranking-tooltip">Completed 30 tasks, no extra points</div>
+                </div>
+            </div>
+            <div class="ranking-item">
+                <span class="ranking-name">Francesco</span>
+                <div class="ranking-bar" style="width: 45%;" data-points="50">
+                    <div class="ranking-tooltip">Completed 24 tasks, no extra points</div>
+                </div>
+            </div>
+            <div class="ranking-item">
+                <span class="ranking-name">Gianni</span>
+                <div class="ranking-bar" style="width: 10%;" data-points="50">
+                    <div class="ranking-tooltip">Completed 20 tasks, no extra points</div>
+                </div>
+            </div>
+            <div class="ranking-item">
+                <span class="ranking-name">Henric</span>
+                <div class="ranking-bar" style="width: 32%;" data-points="50">
+                    <div class="ranking-tooltip">Completed 10 tasks, no extra points</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link to JavaScript file -->
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home Sensor Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 20px;
+        }
+        .data-section {
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .chart-container {
+            width: 100%;
+            margin-bottom: 40px;
+        }
+        /* Sidebar Styles */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #111;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+
+        .sidebar a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            color: #f1f1f1;
+        }
+
+        .sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+
+        .hamburger {
+            font-size: 54px;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+        }
+
+        .moon {
+            font-size: 45px;
+            cursor: pointer;
+            position: absolute;
+            top: 25px;
+            left: 85px;
+        }
+
+        .container {
+            transition: margin-left .5s;
+            padding: 16px;
+        }
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #121212;
+            color: white;
+        }
+
+        body.dark-mode .container {
+            background-color: #383838;
+        }
+
+        body.dark-mode .sidebar {
+            background-color: #333;
+        }
+
+        body.dark-mode .sidebar a {
+            color: #ddd;
+        }
+
+        body.dark-mode .ranking-bar {
+            background-color: #3E8E41;
+        }
+
+        body.dark-mode .ranking-bar:hover {
+            background-color: #367A39;
+        }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+
+      <div class="header">
+          <!-- Hamburger Icon -->
+          <span class="hamburger" onclick="toggleSidebar()">&#9776;</span>
+          <span class="moon" onclick="toggleDarkMode()">&#9789;</span>
+
+      </div>
+
+      <!-- Sidebar Menu -->
+      <div id="sidebar" class="sidebar">
+          <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">&times;</a>
+          <a href="profile.html">My Profile</a>
+          <a href="index.html">Home</a>
+          <a href="ranks.html">Ranks</a>
+          <a href="charts.html">Charts</a>
+      </div>
+        <br><br><br>
+
+
+
+        <div class="data-section">
+            <h2>Weather Forecast</h2>
+            <div class="chart-container" id="temperatureChart"></div>
+            <div class="chart-container" id="precipitationChart"></div>
+            <div class="chart-container" id="humidityChart"></div>
+            <div class="chart-container" id="windSpeedChart"></div>
+            <div class="chart-container" id="uvIndexChart"></div>
+        </div>
+
+        <div class="data-section">
+            <h2>Roof Data</h2>
+            <div class="chart-container" id="airTemperatureChart"></div>
+            <div class="chart-container" id="atmosphericPressureChart"></div>
+            <div class="chart-container" id="precipitationChart"></div>
+            <div class="chart-container" id="solarRadiationChart"></div>
+            <div class="chart-container" id="windSpeedChart"></div>
+        </div>
+
+        <div class="data-section">
+            <h2>Room Data</h2>
+            <div class="chart-container" id="oxygenChart"></div>
+            <div class="chart-container" id="dewptChart"></div>
+            <div class="chart-container" id="no2Chart"></div>
+            <div class="chart-container" id="h2sChart"></div>
+            <div class="chart-container" id="humidityChart"></div>
+            <div class="chart-container" id="soundChart"></div>
+            <div class="chart-container" id="temperatureChart"></div>
+            <div class="chart-container" id="soundMaxChart"></div>
+            <div class="chart-container" id="pm10Chart"></div>
+        </div>
+
+        <div class="data-section">
+            <h2>Energy Data</h2>
+            <div class="chart-container" id="fridgeChart"></div>
+            <div class="chart-container" id="ovenChart"></div>
+            <div class="chart-container" id="airConditioningChart"></div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchWeatherData() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/get_weather_forecast/Linz,Austria');
+                const data = await response.json();
+                plotWeatherData(data.forecasts)
+            } catch (error) {
+                document.getElementById('weatherData').textContent = 'Error fetching weather data: ' + error;
+            }
+        }
+
+        function plotWeatherData(forecasts) {
+            const dates = forecasts.map(f => f.date);
+            const temperatures = forecasts.map(f => f.temp);
+            const precipitations = forecasts.map(f => f.precipitation);
+            const humidities = forecasts.map(f => f.humidity);
+            const windSpeeds = forecasts.map(f => f.wind_speed);
+            const uvIndexes = forecasts.map(f => f.uv_index);
+
+            Plotly.newPlot('temperatureChart', [{
+                x: dates,
+                y: temperatures,
+                type: 'bar',
+                name: 'Temperature (°C)',
+                marker: { color: 'orange' }
+            }], {
+                title: 'Temperature Over Time',
+                xaxis: { title: 'Date' },
+                yaxis: { title: 'Temperature (°C)' }
+            });
+
+            Plotly.newPlot('precipitationChart', [{
+                x: dates,
+                y: precipitations,
+                type: 'bar',
+                name: 'Precipitation (mm)',
+                marker: { color: 'blue' }
+            }], {
+                title: 'Precipitation Over Time',
+                xaxis: { title: 'Date' },
+                yaxis: { title: 'Precipitation (mm)' }
+            });
+
+            Plotly.newPlot('humidityChart', [{
+                x: dates,
+                y: humidities,
+                type: 'line',
+                name: 'Humidity (%)',
+                line: { color: 'green' }
+            }], {
+                title: 'Humidity Over Time',
+                xaxis: { title: 'Date' },
+                yaxis: { title: 'Humidity (%)' }
+            });
+
+            Plotly.newPlot('windSpeedChart', [{
+                x: dates,
+                y: windSpeeds,
+                type: 'line',
+                name: 'Wind Speed (m/s)',
+                line: { color: 'grey' }
+            }], {
+                title: 'Wind Speed Over Time',
+                xaxis: { title: 'Date' },
+                yaxis: { title: 'Wind Speed (m/s)' }
+            });
+
+            Plotly.newPlot('uvIndexChart', [{
+                x: dates,
+                y: uvIndexes,
+                type: 'line',
+                name: 'UV Index',
+                line: { color: 'red' }
+            }], {
+                title: 'UV Index Over Time',
+                xaxis: { title: 'Date' },
+                yaxis: { title: 'UV Index' }
+            });
+        }
+
+        async function fetchRoofData() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/get_roof_data');
+                let data = await response.text();
+                let fixedData = data.replace(/'/g, '"').replace(/\bnan\b/g, 'null');
+                const jsonData = JSON.parse(fixedData);
+                plotRoofData(jsonData);
+            } catch (error) {
+                document.getElementById('roofData').textContent = 'Error fetching roof data: ' + error;
+            }
+        }
+
+        function plotRoofData(data) {
+            const labels = Array.from({ length: data["Air Temperature"].values.length }, (_, i) => `Time ${i + 1}`);
+
+            Plotly.newPlot('airTemperatureChart', [{
+                x: labels,
+                y: data["Air Temperature"].values,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: `Air Temperature (${data["Air Temperature"].unit})`,
+                line: { color: 'rgb(75, 192, 192)' }
+            }], {
+                title: `Air Temperature Over Time`,
+                xaxis: { title: 'Time' },
+                yaxis: { title: `Temperature (${data["Air Temperature"].unit})` }
+            });
+
+            Plotly.newPlot('atmosphericPressureChart', [{
+                x: labels,
+                y: data["Atmospheric Pressure"].values,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: `Atmospheric Pressure (${data["Atmospheric Pressure"].unit})`,
+                line: { color: 'rgb(255, 159, 64)' }
+            }], {
+                title: `Atmospheric Pressure Over Time`,
+                xaxis: { title: 'Time' },
+                yaxis: { title: `Pressure (${data["Atmospheric Pressure"].unit})` }
+            });
+        }
+
+
+        async function fetchRoofData() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/get_roof_data');
+                let data = await response.text();
+
+                let fixedData = data.replace(/'/g, '"').replace(/\bnan\b/g, 'null');
+                const jsonData = JSON.parse(fixedData);
+
+                plotRoofData(jsonData); // Ensure this function is called
+            } catch (error) {
+                document.getElementById('roofData').textContent = 'Error fetching roof data: ' + error;
+            }
+        }
+
+        function plotRoofData(data) {
+            const labels = Array.from({ length: data["Air Temperature"].values.length }, (_, i) => `Time ${i + 1}`);
+
+            Plotly.newPlot('airTemperatureChart', [{
+                x: labels,
+                y: data["Air Temperature"].values,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: `Air Temperature (${data["Air Temperature"].unit})`,
+                line: { color: 'rgb(75, 192, 192)' }
+            }], {
+                title: `Air Temperature Over Time`,
+                xaxis: { title: 'Time' },
+                yaxis: { title: `Temperature (${data["Air Temperature"].unit})` }
+            });
+
+            Plotly.newPlot('atmosphericPressureChart', [{
+                x: labels,
+                y: data["Atmospheric Pressure"].values,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: `Atmospheric Pressure (${data["Atmospheric Pressure"].unit})`,
+                line: { color: 'rgb(255, 159, 64)' }
+            }], {
+                title: `Atmospheric Pressure Over Time`,
+                xaxis: { title: 'Time' },
+                yaxis: { title: `Pressure (${data["Atmospheric Pressure"].unit})` }
+            });
+
+            Plotly.newPlot('precipitationChart', [{
+                x: labels,
+                y: data["Precipitation"].values,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: `Precipitation (${data["Precipitation"].unit})`,
+                line: { color: 'blue' }
+            }], {
+                title: `Precipitation Over Time`,
+                xaxis: { title: 'Time' },
+                yaxis: { title: `Precipitation (${data["Precipitation"].unit})` }
+            });
+
+            Plotly.newPlot('solarRadiationChart', [{
+                x: labels,
+                y: data["Solar Radiation"].values,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: `Solar Radiation (${data["Solar Radiation"].unit})`,
+                line: { color: 'orange' }
+            }], {
+                title: `Solar Radiation Over Time`,
+                xaxis: { title: 'Time' },
+                yaxis: { title: `Solar Radiation (${data["Solar Radiation"].unit})` }
+            });
+
+            Plotly.newPlot('windSpeedChart', [{
+                x: labels,
+                y: data["Wind Speed"].values,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: `Wind Speed (${data["Wind Speed"].unit})`,
+                line: { color: 'grey' }
+            }], {
+                title: `Wind Speed Over Time`,
+                xaxis: { title: 'Time' },
+                yaxis: { title: `Wind Speed (${data["Wind Speed"].unit})` }
+            });
+        }
+
+        async function fetchRoomData() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/get_room_data');
+                let data = await response.text();
+
+                let fixedData = data.replace(/'/g, '"').replace(/\bnan\b/g, 'null');
+                const jsonData = JSON.parse(fixedData);
+
+                plotRoomData(jsonData);
+            } catch (error) {
+                document.getElementById('roomData').textContent = 'Error fetching room data: ' + error;
+            }
+        }
+
+        function plotRoomData(data) {
+            const ids = Object.keys(data);
+            const oxygenData = ids.map(id => data[id].oxygen[0]);
+            const dewptData = ids.map(id => data[id].dewpt[0]);
+            const no2Data = ids.map(id => data[id].no2[0]);
+            const h2sData = ids.map(id => data[id].h2s[0]);
+            const humidityData = ids.map(id => data[id].humidity[0]);
+            const soundData = ids.map(id => data[id].sound[0]);
+            const temperatureData = ids.map(id => data[id].temperature[0]);
+            const soundMaxData = ids.map(id => data[id].sound_max[0]);
+            const pm10Data = ids.map(id => data[id].pm10[0]);
+
+            const plotData = {
+                x: ids,
+                y: oxygenData,
+                type: 'bar',
+                name: 'Oxygen',
+                marker: { color: 'blue' }
+            };
+            Plotly.newPlot('oxygenChart', [plotData], {
+                title: 'Oxygen Levels',
+                xaxis: { title: 'ID' },
+                yaxis: {
+                title: 'Oxygen (%)',
+                range: [0, 50] // Setting y-axis range to 0-100 for percentage
+            }
+            });
+
+            Plotly.newPlot('dewptChart', [{
+                x: ids,
+                y: dewptData,
+                type: 'bar',
+                name: 'Dew Point',
+                marker: { color: 'green' }
+            }], {
+                title: 'Dew Point',
+                xaxis: { title: 'ID' },
+                yaxis: { title: 'Dew Point (°C)' }
+            });
+
+            Plotly.newPlot('no2Chart', [{
+                x: ids,
+                y: no2Data,
+                type: 'bar',
+                name: 'NO2',
+                marker: { color: 'red' }
+            }], {
+                title: 'NO2 Levels',
+                xaxis: { title: 'ID' },
+                yaxis:
+                {
+                title: 'NO2 (µg/m³)',
+                range: [0, 60] // Setting y-axis range to 0-100 for percentage
+            }
+            });
+
+            Plotly.newPlot('h2sChart', [{
+                x: ids,
+                y: h2sData,
+                type: 'bar',
+                name: 'H2S',
+                marker: { color: 'purple' }
+            }], {
+                title: 'H2S Levels',
+                xaxis: { title: 'ID' },
+                yaxis: { title: 'H2S (µg/m³)', range: [0, 20] }
+
+            });
+
+            Plotly.newPlot('humidityChart', [{
+                x: ids,
+                y: humidityData,
+                type: 'bar',
+                name: 'Humidity',
+                marker: { color: 'orange' }
+            }], {
+                title: 'Humidity Levels',
+                xaxis: { title: 'ID' },
+                yaxis: { title: 'Humidity (%)', range: [0,100] }
+            });
+
+            Plotly.newPlot('soundChart', [{
+                x: ids,
+                y: soundData,
+                type: 'bar',
+                name: 'Sound Level',
+                marker: { color: 'cyan' }
+            }], {
+                title: 'Sound Levels',
+                xaxis: { title: 'ID' },
+                yaxis: { title: 'Sound Level (dB)' }
+            });
+
+            Plotly.newPlot('temperatureChart', [{
+                x: ids,
+                y: temperatureData,
+                type: 'bar',
+                name: 'Temperature',
+                marker: { color: 'yellow' }
+            }], {
+                title: 'Temperature Levels',
+                xaxis: { title: 'ID' },
+                yaxis: { title: 'Temperature (°C)' }
+            });
+
+            Plotly.newPlot('soundMaxChart', [{
+                x: ids,
+                y: soundMaxData,
+                type: 'bar',
+                name: 'Max Sound Level',
+                marker: { color: 'magenta' }
+            }], {
+                title: 'Max Sound Levels',
+                xaxis: { title: 'ID' },
+                yaxis: { title: 'Max Sound Level (dB)' }
+            });
+
+            Plotly.newPlot('pm10Chart', [{
+                x: ids,
+                y: pm10Data,
+                type: 'bar',
+                name: 'PM10',
+                marker: { color: 'grey' }
+            }], {
+                title: 'PM10 Levels',
+                xaxis: { title: 'ID' },
+                yaxis: { title: 'PM10 (µg/m³)' }
+            });
+        }
+
+        async function fetchEnergyData() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/get_energy_data');
+                const data = await response.text();
+
+                const fixedData = data.replace(/'/g, '"');
+                const jsonData = JSON.parse(fixedData);
+
+                // Parse consumption data strings as arrays
+                const parsedData = {
+                    fridge: {
+                        consumption: JSON.parse(jsonData.fridge.consumption)
+                    },
+                    oven: {
+                        consumption: JSON.parse(jsonData.oven.consumption)
+                    },
+                    AirConditioning: {
+                        consumption: JSON.parse(jsonData.AirConditioning.consumption)
+                    }
+                };
+
+                plotEnergyData(parsedData);
+            } catch (error) {
+                document.getElementById('energyData').textContent = 'Error fetching energy data: ' + error;
+            }
+        }
+
+        function plotEnergyData(data) {
+            const labels = Array.from({ length: data.fridge.consumption.length }, (_, i) => `Time ${i + 1}`);
+
+            Plotly.newPlot('fridgeChart', [{
+                x: labels,
+                y: data.fridge.consumption,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Fridge Consumption',
+                line: { color: 'rgb(75, 192, 192)' }
+            }], {
+                title: 'Fridge Consumption Over Time',
+                xaxis: { title: 'Time' },
+                yaxis: { title: 'Power Consumption (W)' }
+            });
+
+            Plotly.newPlot('ovenChart', [{
+                x: labels,
+                y: data.oven.consumption,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Oven Consumption',
+                line: { color: 'rgb(255, 99, 132)' }
+            }], {
+                title: 'Oven Consumption Over Time',
+                xaxis: { title: 'Time' },
+                yaxis: { title: 'Power Consumption (W)' }
+            });
+
+            Plotly.newPlot('airConditioningChart', [{
+                x: labels,
+                y: data.AirConditioning.consumption,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Air Conditioning Consumption',
+                line: { color: 'rgb(54, 162, 235)' }
+            }], {
+                title: 'Air Conditioning Consumption Over Time',
+                xaxis: { title: 'Time' },
+                yaxis: { title: 'Power Consumption (W)' }
+            });
+        }
+
+        // Fetch all data on page load
+        fetchWeatherData();
+        fetchRoofData();
+        fetchRoomData();
+        fetchEnergyData();
+    </script>
+      <script src="script.js"></script>
+
+</body>
+</html>

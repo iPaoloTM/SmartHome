@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home AI Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body onload="loadChart()">
+    <div class="container">
+        <div class="header">
+            <!-- Hamburger Icon -->
+            <span class="hamburger" onclick="toggleSidebar()">&#9776;</span>
+            <span class="moon" onclick="toggleDarkMode()">&#9789;</span>
+            <h1>Smart Home AI Assistant</h1>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <div id="sidebar" class="sidebar">
+            <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">&times;</a>
+            <a href="profile.html">My Profile</a>
+            <a href="index.html">Home</a>
+            <a href="ranks.html">Ranks</a>
+            <a href="charts.html">Charts</a>
+        </div>
+
+        <form id="queryForm">
+            <label for="query">Ask the AI:</label>
+            <input type="text" id="query" name="query" placeholder="Enter your question..." required>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="responseContainer">
+            <label for="response">AI Response:</label>
+            <textarea id="response" name="response" rows="6" readonly></textarea>
+        </div>
+        <div id="acceptContainer">
+            <button class="accept" type="submit" onclick="checkAnswer()">Accept</button>
+            <button class="ignore" type="submit">Ignore</button>
+        </div>
+        <br><br><br>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
